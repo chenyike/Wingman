@@ -20,6 +20,8 @@
 #define TXADDRESS 0x01
 #define PACKET_LENGTH 1
 
+volatile float n = 0;
+volatile flag = true;
 volatile long timer0_ticks = 0;
 volatile float trigle = 0;
 volatile char buffer[PACKET_LENGTH];
@@ -73,6 +75,53 @@ int main(void)
         trigle = check(PIND,3);    //get the reading from D3
 
         
+
+        start_timer();
+
+        if ((int)buffer[0] == 1)
+        {
+            n += 1;            
+        }
+
+        if (timer0_ticks >= 20)
+        {
+            stop_timer();
+            timer0_ticks = 0;
+            if (n > 0 && n <= 3)
+            {
+                set(PORTD,4);
+            }
+
+            else if (n>= 4 && n < 9)
+            {
+                m_green(ON);
+            }
+
+            else if (n>= 10)
+            {
+                m_red(ON);
+            }
+
+
+
+            m_usb_tx_int((int)n); m_usb_tx_string(" \n");
+            n = 0;
+            m_wait(50);
+            m_red(OFF);
+            m_green(OFF);
+            clear(PORTD,4);
+
+        }
+
+        
+
+        
+
+        
+
+
+
+        /*
         switch((int)buffer[0])
         {
             case 1:
@@ -83,6 +132,7 @@ int main(void)
             clear(PORTD,4);
             break;
         }
+        */
         
 
 
@@ -117,7 +167,6 @@ ISR(INT2_vect)
 {
     m_rf_read(buffer,PACKET_LENGTH);
     m_usb_tx_int((int)buffer[0]); m_usb_tx_string("\n");
-    m_green(TOGGLE);
 }
 
 
