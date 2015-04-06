@@ -68,12 +68,14 @@ int main(void)
 
     clear(DDRD,3);   //set D3 as input
     set(DDRD,4);   // set D4 as output
+    set(DDRD,5);   // set D4 as output
+
     
 
     while (1)
     {
         trigle = check(PIND,3);    //get the reading from D3
-
+        clear(PORTD,5);
         
 
         start_timer();
@@ -87,21 +89,15 @@ int main(void)
         {
             stop_timer();
             timer0_ticks = 0;
-            if (n > 0 && n <= 3)
+            if (n > 0 && n <= 5)
             {
                 set(PORTD,4);
             }
 
-            else if (n>= 4 && n < 9)
-            {
-                m_green(ON);
-            }
-
-            else if (n>= 10)
+            else if (n>= 9)
             {
                 m_red(ON);
             }
-
 
 
             m_usb_tx_int((int)n); m_usb_tx_string(" \n");
@@ -166,6 +162,7 @@ ISR(TIMER0_OVF_vect)
 ISR(INT2_vect)
 {
     m_rf_read(buffer,PACKET_LENGTH);
+    set(PORTD,5);
     m_usb_tx_int((int)buffer[0]); m_usb_tx_string("\n");
 }
 
